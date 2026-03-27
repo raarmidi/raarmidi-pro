@@ -260,9 +260,9 @@ function App() {
           </div>
         </nav>
 
-        <main className="max-w-[1700px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
-          <aside className="lg:col-span-3 space-y-6">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border sticky top-28">
+        <main className="max-w-[1350px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <aside className="lg:col-span-2 space-y-6">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border sticky top-28  lg:-ml-10">
               <h2 className="font-black text-[10px] uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2 italic"><PlusCircle size={14}/> Yeni Ürün Tanımla</h2>
               <form onSubmit={addProduct} className="space-y-4">
                 <input required placeholder="Model İsmi" value={name} onChange={e=>setName(e.target.value)} className="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold text-sm outline-none" />
@@ -294,20 +294,20 @@ function App() {
             </div>
           </aside>
 
-          <section className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+          <section className="lg:col-span-9 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 items-start">
             {products.filter(p=>p.name.toLowerCase().includes(searchTerm.toLowerCase())).map(p => {
               const loc = getProductLocationStatus(p);
               return (
                 <div key={p.id} onClick={()=>{setSelectedProduct(p); setView('detail');}} className="bg-white rounded-[2.5rem] overflow-hidden border hover:shadow-xl transition-all cursor-pointer group flex flex-col relative">
-                  <div className="relative aspect-[3/4.2] overflow-hidden">
+                  <div className="relative aspect-[4/5] overflow-hidden">
                     <img src={p.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
                     <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-[8px] font-black shadow-lg text-white flex items-center gap-1.5 ${loc.color}`}>
                       {loc.icon} {loc.label}
                     </div>
                   </div>
-                  <div className="p-6 text-center">
-                    <h4 className="font-black uppercase text-slate-700 tracking-tighter truncate text-sm mb-1">{p.name}</h4>
-                    <p className="text-indigo-600 font-black text-sm">{p.price} TL</p>
+                  <div className="p-3 text-center">
+                    <h4 className="font-black uppercase text-slate-700 tracking-tighter truncate text-xs mb-1">{p.name}</h4>
+                    <p className="text-indigo-600 font-black text-xs">{p.price} TL</p>
                   </div>
                 </div>
               )
