@@ -35,6 +35,9 @@ function App() {
   const [tempRentalEndDate, setTempRentalEndDate] = useState('')
   const [tempDeposit, setTempDeposit] = useState(0)
   const [tempPhone, setTempPhone] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false) // <-- Buraya ekle
+  const [loginUser, setLoginUser] = useState('')                // <-- Buraya ekle
+  const [loginPass, setLoginPass] = useState('')
 
   useEffect(() => { fetchData() }, [])
 
@@ -47,6 +50,24 @@ function App() {
       setRentals(rData || [])
     } catch (err) { console.error("Veri hatası:", err) }
     setLoading(false)
+  }
+ // Sayfa ilk açıldığında veya yenilendiğinde çalışır
+  useEffect(() => {
+    const logged = sessionStorage.getItem('isLogged');
+    if (logged === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // Giriş yap butonuna basınca çalışır
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (loginUser === 'admin' && loginPass === 'ramazan123') {
+      sessionStorage.setItem('isLogged', 'true'); // Hafızaya al
+      setIsAuthenticated(true);
+    } else {
+      alert("Hatalı kullanıcı adı veya şifre!");
+    }
   }
 
   const getTodayDateString = () => {
@@ -247,8 +268,46 @@ function App() {
     if (selectedRental) setSelectedRental(prev => ({ ...prev, status: newStatus }))
     setLoading(false)
   }
-
+// Eğer giriş yapılmadıysa sadece bu ekranı göster
+if (!isAuthenticated) {
   return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-md border-4 border-indigo-500/20">
+        <div className="text-center mb-8">
+          <div className="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-indigo-500/40">
+            <LayoutDashboard size={32}/>
+          </div>
+          <h1 className="font-black text-2xl tracking-tighter uppercase italic text-slate-900">
+            RaarMidi <span className="text-indigo-600">Pro</span>
+          </h1>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">Yönetim Paneli Girişi</p>
+        </div>
+        
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input 
+            type="text" 
+            placeholder="Kullanıcı Adı" 
+            value={loginUser}
+            onChange={(e) => setLoginUser(e.target.value)}
+            className="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 ring-indigo-500 transition-all"
+          />
+          <input 
+            type="password" 
+            placeholder="Şifre" 
+            value={loginPass}
+            onChange={(e) => setLoginPass(e.target.value)}
+            className="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold text-sm outline-none focus:ring-2 ring-indigo-500 transition-all"
+          />
+          <button className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
+            SİSTEME GİRİŞ YAP
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+  return (
+    
     <>
       <DialogUI />
 
