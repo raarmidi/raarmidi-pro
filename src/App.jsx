@@ -277,19 +277,21 @@ function App() {
           <div className="flex items-center gap-2">
             <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-lg"><LayoutDashboard size={20}/></div>
             <h1 className="font-black text-xl tracking-tighter uppercase italic">RaarMidi <span className="text-indigo-600">Pro</span></h1>
-            <button
-  onClick={() => exportBackup(products, rentals)}
-  className="bg-black text-white px-4 py-2 rounded-xl hover:opacity-80"
->
-  Yedek İndir
-</button>
+            
           </div>
+          
           <div className="order-3 lg:order-2 w-full lg:w-96 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16}/>
             <input className="w-full bg-slate-100 rounded-2xl py-2.5 pl-12 pr-4 outline-none focus:ring-2 ring-indigo-500 text-sm font-bold" placeholder="Model ara..." onChange={e=>setSearchTerm(e.target.value)} />
           </div>
           
           <div className="flex items-center gap-3 order-2 lg:order-3">
+            <button
+  onClick={() => exportBackup(products, rentals)}
+  className="bg-black text-white px-4 py-2 rounded-xl hover:opacity-80"
+>
+  Yedek İndir
+</button>
              <button onClick={() => setView('calendar')} className="p-3 bg-white border rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm"><CalendarDays size={20}/></button>
              <button onClick={() => setView('stats')} className="bg-slate-900 text-white px-5 py-2 rounded-2xl flex items-center gap-4 hover:scale-105 transition-all shadow-xl active:scale-95 group">
                 <div className="text-right border-r border-white/10 pr-4">
