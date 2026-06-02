@@ -1463,13 +1463,22 @@ const [currentClient, setCurrentClient] = useState(null);
                 {isEditingRental && <button onClick={saveRentalUpdate} className="w-full mt-4 bg-indigo-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">KAYDET</button>}
               </div>
               <div className="space-y-3">
-                <button onClick={() => updateRentalStatus(selectedRental.id, 'Ödendi')} className={`w-full py-4 rounded-2xl font-black text-[10px] flex items-center justify-center gap-3 transition-all ${selectedRental.status === 'Ödendi' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}><CheckCircle2 size={16}/> ÖDEME ALINDI</button>
-                
-                {/* DİĞER İŞLETMELER İÇİN SAKLANAN DURUM BUTONLARI
-                <button onClick={() => updateRentalStatus(selectedRental.id, 'Teslim Edildi')} className={`w-full py-4 rounded-2xl font-black text-[10px] flex items-center justify-center gap-3 transition-all ${selectedRental.status === 'Teslim Edildi' ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}><Package size={16}/> ÜRÜN MÜŞTERİDE</button>
-                <button onClick={() => updateRentalStatus(selectedRental.id, 'Tamamlandı')} className={`w-full py-4 rounded-2xl font-black text-[10px] flex items-center justify-center gap-3 transition-all ${selectedRental.status === 'Tamamlandı' ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}><Clock size={16}/> ÜRÜN GERİ ALINDI</button>
-                */}
-              </div>
+    {/* 1. ADIM: ÖDEME BUTONU */}
+    <button onClick={() => updateRentalStatus(selectedRental.id, 'Ödendi')} className={`w-full py-4 rounded-2xl font-black text-[10px] flex items-center justify-center gap-3 transition-all ${selectedRental.status === 'Ödendi' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>
+      <CheckCircle2 size={16}/> 1- ÖDEME ALINDI
+    </button>
+    
+    {/* 2. ADIM: ÜRÜNÜ GERİ ALMA (BİTİRME) BUTONU */}
+    <button onClick={async () => {
+      const onay = await confirm("Ürün dükkana teslim alındı ve bu kiralama işlemi bitirilecek. Onaylıyor musunuz?", { title: 'İşlemi Bitir', type: 'warn', confirmLabel: 'Evet, Teslim Alındı', cancelLabel: 'İptal' });
+      if (onay) {
+        updateRentalStatus(selectedRental.id, 'Tamamlandı');
+        setView('list'); // İşlem bitince ana listeye dön
+      }
+    }} className={`w-full py-4 rounded-2xl font-black text-[10px] flex items-center justify-center gap-3 transition-all ${selectedRental.status === 'Tamamlandı' ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>
+      <Package size={16}/> 2- ÜRÜN TESLİM ALINDI (KİRALAMAYI BİTİR)
+    </button>
+  </div>
             </div>
             <div className="p-8 border-t bg-slate-50 shrink-0 flex justify-center">
               <button onClick={async () => {
