@@ -375,6 +375,7 @@ const [currentClient, setCurrentClient] = useState(null);
     { key: 'YARIN_GİDECEK', label: 'Yarın Gidecekler', color: 'bg-violet-500 text-white', inactive: 'bg-white text-violet-600 border border-violet-200 hover:bg-violet-50' },
     { key: 'YARIN_DÖNECEK', label: 'Yarın Dönecekler', color: 'bg-orange-500 text-white', inactive: 'bg-white text-orange-600 border border-orange-200 hover:bg-orange-50' },
     // BAŞKA İŞLETMELER İÇİN SAKLANAN (GİZLENEN) FİLTRELER
+    { key: 'TERZİDE',     label: 'Terzide',    color: 'bg-amber-500 text-white',   inactive: 'bg-white text-amber-600 border border-amber-200 hover:bg-amber-50' }
     /* { key: 'REZERVE',    label: 'Rezerve',    color: 'bg-violet-500 text-white',  inactive: 'bg-white text-violet-600 border border-violet-200 hover:bg-violet-50' }, */
     /* { key: 'TEMİZLİKTE', label: 'Temizlikte', color: 'bg-blue-500 text-white',    inactive: 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50' }, */
     /* { key: 'TERZİDE',    label: 'Terzide',    color: 'bg-amber-500 text-white',   inactive: 'bg-white text-amber-600 border border-amber-200 hover:bg-amber-50' }, */
@@ -1170,16 +1171,27 @@ const [currentClient, setCurrentClient] = useState(null);
                     <div className="flex items-center gap-2 font-black text-[10px] uppercase">{loc.icon} {loc.label}</div>
                   </div>
                 </div>
-                {/* DİĞER İŞLETMELER İÇİN SAKLANAN (GİZLENEN) HIZLI KONUM ALANI
-                <div className="bg-slate-50 p-6 rounded-[2rem] border space-y-3">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase mb-2 px-2 italic">Hızlı Konum Değiştir</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button onClick={() => updateProductStatus('Müsait')} className={`p-3 rounded-xl flex flex-col items-center gap-1 border transition-all ${selectedProduct.status === 'Müsait' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-400 hover:border-emerald-200'}`}><Home size={16}/><span className="text-[8px] font-black">DÜKKAN</span></button>
-                    <button onClick={() => updateProductStatus('Temizlikte')} className={`p-3 rounded-xl flex flex-col items-center gap-1 border transition-all ${selectedProduct.status === 'Temizlikte' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-400 hover:border-blue-200'}`}><Wind size={16}/><span className="text-[8px] font-black">YIKAMA</span></button>
-                    <button onClick={() => updateProductStatus('Terzide')} className={`p-3 rounded-xl flex flex-col items-center gap-1 border transition-all ${selectedProduct.status === 'Terzide' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-slate-400 hover:border-amber-200'}`}><Scissors size={16}/><span className="text-[8px] font-black">TERZİ</span></button>
-                  </div>
-                </div>
-                */}
+                {/* HIZLI DURUM DEĞİŞTİR (TERZİ / DÜKKAN) */}
+  <div className="bg-slate-50 p-6 rounded-[2rem] border space-y-3 shadow-sm mb-6">
+    <h4 className="text-[10px] font-black text-slate-400 uppercase mb-2 px-2 italic">Hızlı Konum Değiştir</h4>
+    <div className="grid grid-cols-2 gap-2">
+      <button 
+        onClick={() => updateProductStatus('Müsait')} 
+        className={`p-3 rounded-xl flex flex-col items-center gap-1 border transition-all ${selectedProduct.status === 'Müsait' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white text-slate-400 hover:border-emerald-200'}`}
+      >
+        <Home size={16}/>
+        <span className="text-[8px] font-black">DÜKKANDA (MÜSAİT)</span>
+      </button>
+      
+      <button 
+        onClick={() => updateProductStatus('Terzide')} 
+        className={`p-3 rounded-xl flex flex-col items-center gap-1 border transition-all ${selectedProduct.status === 'Terzide' ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white text-slate-400 hover:border-amber-200'}`}
+      >
+        <Scissors size={16}/>
+        <span className="text-[8px] font-black">TERZİDE</span>
+      </button>
+    </div>
+  </div>
                 {editMode && (
                   <div className="bg-slate-50 p-6 rounded-[2rem] border space-y-3">
                     <input value={selectedProduct.name} onChange={e => setSelectedProduct({ ...selectedProduct, name: e.target.value })} className="w-full p-4 rounded-xl border-none font-bold text-sm outline-none shadow-sm" />
@@ -1212,10 +1224,17 @@ const [currentClient, setCurrentClient] = useState(null);
                           <label className="text-[8px] font-black text-indigo-400 uppercase block mb-1">Başlangıç</label>
                           <input type="date" required value={startDate} onChange={e => handleDateLogic(e.target.value)} className="w-full bg-transparent border-none text-white font-bold text-sm outline-none" />
                         </div>
-                        <div className="bg-white/5 p-3 rounded-xl opacity-50 border border-white/10">
-                          <label className="text-[8px] font-black text-slate-400 uppercase block mb-1">Teslim (3. Gün)</label>
-                          <input type="date" disabled value={endDate} className="w-full bg-transparent border-none text-white font-bold text-sm" />
-                        </div>
+                        <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-indigo-400 transition-all">
+  <label className="text-[8px] font-black text-indigo-200 uppercase block mb-1">İade Tarihi</label>
+  <input 
+    type="date" 
+    required
+    value={endDate} 
+    onChange={e => setEndDate(e.target.value)} 
+    className="w-full bg-transparent border-none text-white font-bold text-sm outline-none cursor-pointer" 
+    title="Otomatik hesaplandı, isterseniz değiştirebilirsiniz"
+  />
+</div>
                       </div>
                       <div className="flex gap-3">
                         <input type="number" placeholder="Kapora" value={deposit} onChange={e => setDeposit(e.target.value)} className="flex-1 p-4 bg-white/10 rounded-xl border-none text-white font-black text-sm outline-none" />
@@ -1444,9 +1463,15 @@ const [currentClient, setCurrentClient] = useState(null);
                 </div>
                 <div className="grid grid-cols-1 gap-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div><label className="text-[8px] font-black text-slate-400 uppercase block mb-1 ml-2">Alım Günü</label><input type="date" disabled={!isEditingRental} value={tempRentalDate} onChange={e => handleDateLogic(e.target.value, 'edit')} className={`w-full p-3 rounded-xl border font-bold text-sm ${isEditingRental ? 'bg-white border-indigo-200' : 'bg-transparent border-transparent'}`} /></div>
-                    <div><label className="text-[8px] font-black text-slate-400 uppercase block mb-1 ml-2">Kapora</label><input type="number" disabled={!isEditingRental} value={tempDeposit} onChange={e => setTempDeposit(e.target.value)} className={`w-full p-3 rounded-xl border font-bold text-sm ${isEditingRental ? 'bg-white border-indigo-200' : 'bg-transparent border-transparent'}`} /></div>
-                  </div>
+  <div>
+    <label className="text-[8px] font-black text-slate-400 uppercase block mb-1 ml-2">Alım Günü</label>
+    <input type="date" disabled={!isEditingRental} value={tempRentalDate} onChange={e => handleDateLogic(e.target.value, 'edit')} className={`w-full p-3 rounded-xl border font-bold text-sm ${isEditingRental ? 'bg-white border-indigo-200 cursor-pointer' : 'bg-transparent border-transparent'}`} />
+  </div>
+  <div>
+    <label className="text-[8px] font-black text-slate-400 uppercase block mb-1 ml-2">İade Günü</label>
+    <input type="date" disabled={!isEditingRental} value={tempRentalEndDate} onChange={e => setTempRentalEndDate(e.target.value)} className={`w-full p-3 rounded-xl border font-bold text-sm ${isEditingRental ? 'bg-white border-indigo-200 cursor-pointer' : 'bg-transparent border-transparent'}`} />
+  </div>
+</div>
                   <div>
                     <label className="text-[8px] font-black text-slate-400 uppercase block mb-1 ml-2">Telefon Numarası</label>
                     <div className="flex gap-2">
