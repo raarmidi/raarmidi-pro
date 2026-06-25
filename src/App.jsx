@@ -38,6 +38,7 @@ function App() {
   const [tempPhone, setTempPhone] = useState('')
   const [session, setSession] = useState(null)
 const [currentClient, setCurrentClient] = useState(null);
+const [discount, setDiscount] = useState(0);
   // --- PATRON (SUPER ADMIN) AYARLARI ---
   const PATRON_EMAIL = 'patron@raarmidi.com'; // KENDİ MAİLİNİ BURAYA YAZACAKSIN
   const [clients, setClients] = useState([]);
@@ -622,7 +623,7 @@ const [currentClient, setCurrentClient] = useState(null);
       start_date: startDate, 
       end_date: endDate, 
       deposit_amount: parseInt(deposit) || 0,
-      total_price: parseInt(selectedProduct.price), 
+      total_price: parseInt(selectedProduct.price) - (parseInt(discount) || 0),
       status: 'Beklemede', 
       is_archived: false
     }]);
@@ -1237,7 +1238,15 @@ const [currentClient, setCurrentClient] = useState(null);
 </div>
                       </div>
                       <div className="flex gap-3">
-                        <input type="number" placeholder="Kapora" value={deposit} onChange={e => setDeposit(e.target.value)} className="flex-1 p-4 bg-white/10 rounded-xl border-none text-white font-black text-sm outline-none" />
+                        <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-indigo-400 transition-all">
+    <label className="text-[8px] font-black text-indigo-200 uppercase block mb-1">Kapora (TL)</label>
+    <input type="number" min="0" value={deposit} onChange={e => setDeposit(e.target.value)} placeholder="0" className="w-full bg-transparent border-none text-white font-bold text-sm outline-none" />
+  </div>
+
+  <div className="bg-white/5 p-3 rounded-xl border border-white/10 hover:border-pink-400 transition-all">
+    <label className="text-[8px] font-black text-pink-200 uppercase block mb-1">İndirim (TL)</label>
+    <input type="number" min="0" value={discount} onChange={e => setDiscount(e.target.value)} placeholder="0" className="w-full bg-transparent border-none text-white font-bold text-sm outline-none" />
+  </div>
                         <button disabled={loading} className="flex-1 bg-white text-slate-900 py-4 rounded-xl font-black uppercase text-xs active:scale-95 transition-all">KAYDET</button>
                       </div>
                     </div>
@@ -1488,6 +1497,28 @@ const [currentClient, setCurrentClient] = useState(null);
                 {isEditingRental && <button onClick={saveRentalUpdate} className="w-full mt-4 bg-indigo-600 text-white py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">KAYDET</button>}
               </div>
               <div className="space-y-3">
+                {/* KALAN BAKİYE GÖSTERGE PANOLARI */}
+  {(() => {
+    const bakiye = selectedRental.total_price - selectedRental.deposit_amount;
+    return (
+      <div className={`p-5 rounded-2xl mb-4 border shadow-sm ${bakiye > 0 ? 'bg-rose-50 border-rose-200' : 'bg-emerald-50 border-emerald-200'}`}>
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-[10px] font-black text-slate-500 uppercase">Anlaşılan Fiyat:</span>
+          <span className="text-xs font-bold text-slate-700">{selectedRental.total_price} TL</span>
+        </div>
+        <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-200/60">
+          <span className="text-[10px] font-black text-slate-500 uppercase">Alınan Kapora:</span>
+          <span className="text-xs font-bold text-slate-700">{selectedRental.deposit_amount} TL</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className={`text-[12px] font-black uppercase ${bakiye > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>Kalan Bakiye:</span>
+          <span className={`text-lg font-black ${bakiye > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+            {bakiye > 0 ? `${bakiye} TL` : 'BORÇ YOK (0 TL)'}
+          </span>
+        </div>
+      </div>
+    );
+  })()}
     {/* 1. ADIM: ÖDEME BUTONU */}
     <button onClick={() => updateRentalStatus(selectedRental.id, 'Ödendi')} className={`w-full py-4 rounded-2xl font-black text-[10px] flex items-center justify-center gap-3 transition-all ${selectedRental.status === 'Ödendi' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>
       <CheckCircle2 size={16}/> 1- ÖDEME ALINDI
