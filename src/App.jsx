@@ -43,7 +43,7 @@ const [discount, setDiscount] = useState(0);
   const PATRON_EMAIL = 'patron@raarmidi.com'; // KENDİ MAİLİNİ BURAYA YAZACAKSIN
   const [clients, setClients] = useState([]);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
-const HIZMET_DURUMU = "AKTIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
+const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
   
   // Patron panelindeki verileri çekmek için:
   const fetchClients = async () => {
