@@ -45,37 +45,35 @@ const [discount, setDiscount] = useState(0);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
 const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
   useEffect(() => {
-  // 1. İlk yüklemede durumu veritabanından çek
-  const fetchStatus = async () => {
-    const { data } = await supabase.from('settings').select('value').eq('key', 'hizmet_durumu').single();
-    if (data?.value === 'PASIF') {
-      setIsSystemActive(false); 
-    } else {
-      setIsSystemActive(true);
-    }
-  };
-  fetchStatus();
+    // 1. Durumu çek
+    const fetchStatus = async () => {
+      const { data } = await supabase.from('settings').select('value').eq('key', 'hizmet_durumu').single();
+      if (data?.value === 'PASIF') setIsSystemActive(false);
+      else setIsSystemActive(true);
+    };
+    fetchStatus();
 
-  // 2. Realtime (Anlık) Dinleyiciyi Başlat
-  const channel = supabase
-    .channel('settings_channel')
-    .on('postgres_changes', 
-      { event: 'UPDATE', schema: 'public', table: 'settings', filter: 'key=eq.hizmet_durumu' }, 
-      (payload) => {
-        // Veritabanı anlık değiştiği an burası tetiklenir!
-        if (payload.new.value === 'PASIF') {
-          setIsSystemActive(false); // Ekran anında kararır
-        } else {
-          setIsSystemActive(true);  // Ekran anında geri açılır
+    // 2. Realtime Dinleyici (BURASI KRİTİK)
+    const channel = supabase
+      .channel('any_name') // Buraya herhangi bir isim verebilirsin
+      .on(
+        'postgres_changes', 
+        { event: 'UPDATE', schema: 'public', table: 'settings' }, 
+        (payload) => {
+          console.log("Değişiklik algılandı:", payload); // Bunu F12 konsolunda görebiliyor musun?
+          if (payload.new.value === 'PASIF') {
+            setIsSystemActive(false);
+          } else {
+            setIsSystemActive(true);
+          }
         }
-      }
-    )
-    .subscribe();
+      )
+      .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
-}, []);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   // Patron panelindeki verileri çekmek için:
   const fetchClients = async () => {
     const { data } = await supabase.from('clients').select('*').order('created_at', { ascending: false });
