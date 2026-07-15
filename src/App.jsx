@@ -43,7 +43,7 @@ const [discount, setDiscount] = useState(0);
   const PATRON_EMAIL = 'patron@raarmidi.com'; // KENDİ MAİLİNİ BURAYA YAZACAKSIN
   const [clients, setClients] = useState([]);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
-const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
+const HIZMET_DURUMU = "AKTIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
 
 useEffect(() => {
   const checkStatus = async () => {
@@ -64,35 +64,16 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
   useEffect(() => {
-    // 1. Durumu çek
-    const fetchStatus = async () => {
-      const { data } = await supabase.from('settings').select('value').eq('key', 'hizmet_durumu').single();
-      if (data?.value === 'PASIF') setIsSystemActive(false);
-      else setIsSystemActive(true);
-    };
-    fetchStatus();
+  // 1. Sayfa açıldığında verileri hemen çek
+  fetchData();
 
-    // 2. Realtime Dinleyici (BURASI KRİTİK)
-    const channel = supabase
-      .channel('any_name') // Buraya herhangi bir isim verebilirsin
-      .on(
-        'postgres_changes', 
-        { event: 'UPDATE', schema: 'public', table: 'settings' }, 
-        (payload) => {
-          console.log("Değişiklik algılandı:", payload); // Bunu F12 konsolunda görebiliyor musun?
-          if (payload.new.value === 'PASIF') {
-            setIsSystemActive(false);
-          } else {
-            setIsSystemActive(true);
-          }
-        }
-      )
-      .subscribe();
+  // 2. Her 30 saniyede bir verileri tekrar kontrol et (Sürekli Güncelleme)
+  const interval = setInterval(() => {
+    fetchData(); // Senin zaten yazdığın o harika güvenlik fonksiyonunu tetikler
+  }, 30000); // 30 saniye boyunca her şey yolunda mı diye sorar
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  return () => clearInterval(interval);
+}, []); // [] sayesinde sadece sayfa açıldığında başlatır
 
   
   // Patron panelindeki verileri çekmek için:
