@@ -44,7 +44,22 @@ const [discount, setDiscount] = useState(0);
   const [clients, setClients] = useState([]);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
 const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
-  
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      // Supabase'den güncel durumu sorgula
+      const { data, error } = await supabase
+        .from('settings') // Veya hangi tablonda tutuyorsan
+        .select('status')
+        .eq('id', 'hizmet-durumu')
+        .single();
+
+      if (data && data.status === 'PASIF') {
+        window.location.reload(); // Sayfayı yeniler ve bizim o kapama ekranına düşürür
+      }
+    }, 60000); // Her 60 saniyede bir kontrol eder
+
+    return () => clearInterval(interval);
+  }, []);
   // Patron panelindeki verileri çekmek için:
   const fetchClients = async () => {
     const { data } = await supabase.from('clients').select('*').order('created_at', { ascending: false });
