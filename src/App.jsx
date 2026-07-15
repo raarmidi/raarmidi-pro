@@ -45,24 +45,28 @@ const [discount, setDiscount] = useState(0);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
 const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
   useEffect(() => {
-  // 1. Durumu ilk açılışta çek
+  // 1. İlk yüklemede durumu veritabanından çek
   const fetchStatus = async () => {
     const { data } = await supabase.from('settings').select('value').eq('key', 'hizmet_durumu').single();
-    if (data?.value === 'PASIF') setIsSystemActive(false);
+    if (data?.value === 'PASIF') {
+      setIsSystemActive(false); 
+    } else {
+      setIsSystemActive(true);
+    }
   };
   fetchStatus();
 
   // 2. Realtime (Anlık) Dinleyiciyi Başlat
   const channel = supabase
-    .channel('schema-db-changes')
+    .channel('settings_channel')
     .on('postgres_changes', 
       { event: 'UPDATE', schema: 'public', table: 'settings', filter: 'key=eq.hizmet_durumu' }, 
       (payload) => {
-        // Veritabanı değiştiği an burası çalışır!
+        // Veritabanı anlık değiştiği an burası tetiklenir!
         if (payload.new.value === 'PASIF') {
-          setIsSystemActive(false); // Sayfa yenilenmesine gerek kalmadan kilitlenir
+          setIsSystemActive(false); // Ekran anında kararır
         } else {
-          setIsSystemActive(true); // Ödeme gelirse geri açılır
+          setIsSystemActive(true);  // Ekran anında geri açılır
         }
       }
     )
@@ -115,7 +119,7 @@ const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
   const [newPassword, setNewPassword] = useState('')
   // Dükkan adını tarayıcı hafızasında (localStorage) tutuyoruz ki yenilenince silinmesin
   const [shopName, setShopName] = useState(() => localStorage.getItem('shopName') || 'Abiyem Van')
-
+const [isSystemActive, setIsSystemActive] = useState(true);
   useEffect(() => {
     // Supabase Oturum Kontrolü
     supabase.auth.getSession().then(({ data: { session } }) => {
