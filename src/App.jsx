@@ -43,7 +43,26 @@ const [discount, setDiscount] = useState(0);
   const PATRON_EMAIL = 'patron@raarmidi.com'; // KENDİ MAİLİNİ BURAYA YAZACAKSIN
   const [clients, setClients] = useState([]);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
-const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
+const HIZMET_DURUMU = "AKTIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
+
+useEffect(() => {
+  const checkStatus = async () => {
+    // Veritabanına gidip durumu kontrol et
+    const { data } = await supabase.from('settings').select('value').eq('key', 'hizmet_durumu').single();
+    
+    // Eğer veritabanında PASIF yazıyorsa, sistemi ÖLDÜR
+    if (data?.value === 'PASIF') {
+      document.body.innerHTML = '<div style="height:100vh; display:flex; justify-content:center; align-items:center; background:black; color:white; font-size:30px;">SİSTEM ERİŞİME KAPATILDI</div>';
+      // Veya sayfayı tamamen boşalt:
+      window.location.reload(); 
+    }
+  };
+
+  // 5 saniyede bir sürekli kontrol et (Heartbeat)
+  const interval = setInterval(checkStatus, 5000); 
+
+  return () => clearInterval(interval);
+}, []);
   useEffect(() => {
     // 1. Durumu çek
     const fetchStatus = async () => {
@@ -74,6 +93,8 @@ const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
       supabase.removeChannel(channel);
     };
   }, []);
+
+  
   // Patron panelindeki verileri çekmek için:
   const fetchClients = async () => {
     const { data } = await supabase.from('clients').select('*').order('created_at', { ascending: false });
