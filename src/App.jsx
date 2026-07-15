@@ -45,21 +45,33 @@ const [discount, setDiscount] = useState(0);
   // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
 const HIZMET_DURUMU = "PASIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
   useEffect(() => {
-    const interval = setInterval(async () => {
-      // Supabase'den güncel durumu sorgula
-      const { data, error } = await supabase
-        .from('settings') // Veya hangi tablonda tutuyorsan
-        .select('status')
-        .eq('id', 'hizmet-durumu')
-        .single();
+  // 1. Durumu ilk açılışta çek
+  const fetchStatus = async () => {
+    const { data } = await supabase.from('settings').select('value').eq('key', 'hizmet_durumu').single();
+    if (data?.value === 'PASIF') setIsSystemActive(false);
+  };
+  fetchStatus();
 
-      if (data && data.status === 'PASIF') {
-        window.location.reload(); // Sayfayı yeniler ve bizim o kapama ekranına düşürür
+  // 2. Realtime (Anlık) Dinleyiciyi Başlat
+  const channel = supabase
+    .channel('schema-db-changes')
+    .on('postgres_changes', 
+      { event: 'UPDATE', schema: 'public', table: 'settings', filter: 'key=eq.hizmet_durumu' }, 
+      (payload) => {
+        // Veritabanı değiştiği an burası çalışır!
+        if (payload.new.value === 'PASIF') {
+          setIsSystemActive(false); // Sayfa yenilenmesine gerek kalmadan kilitlenir
+        } else {
+          setIsSystemActive(true); // Ödeme gelirse geri açılır
+        }
       }
-    }, 60000); // Her 60 saniyede bir kontrol eder
+    )
+    .subscribe();
 
-    return () => clearInterval(interval);
-  }, []);
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
   // Patron panelindeki verileri çekmek için:
   const fetchClients = async () => {
     const { data } = await supabase.from('clients').select('*').order('created_at', { ascending: false });
