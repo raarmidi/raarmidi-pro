@@ -42,6 +42,8 @@ const [discount, setDiscount] = useState(0);
   // --- PATRON (SUPER ADMIN) AYARLARI ---
   const PATRON_EMAIL = 'patron@raarmidi.com'; // KENDİ MAİLİNİ BURAYA YAZACAKSIN
   const [clients, setClients] = useState([]);
+  // BURAYI SADECE SENİN GÖRDÜĞÜN YER OLARAK DÜŞÜN
+const HIZMET_DURUMU = "AKTIF"; // Ödeme gelmezse burayı "PASIF" yapacaksın
   
   // Patron panelindeki verileri çekmek için:
   const fetchClients = async () => {
@@ -711,6 +713,35 @@ const [discount, setDiscount] = useState(0);
         </div>
       </>
     )
+  }
+
+  if (HIZMET_DURUMU !== "AKTIF") {
+    return (
+      <div style={{
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        fontFamily: 'sans-serif', 
+        textAlign: 'center',
+        backgroundColor: '#111827',
+        color: 'white',
+        padding: '20px'
+      }}>
+        <h1 style={{fontSize: '48px', marginBottom: '20px'}}>⚠️ SİSTEM ERİŞİME KAPATILDI</h1>
+        <p style={{fontSize: '18px', color: '#9ca3af', marginBottom: '40px'}}>
+          Hizmet kullanım süreniz dolmuştur ve ödeme teyit edilememiştir.<br/>
+          Sistemi tekrar aktif etmek için lütfen yazılım desteğinizle iletişime geçiniz.
+        </p>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{padding: '10px 20px', backgroundColor: '#3b82f6', border: 'none', borderRadius: '8px', color: 'white', fontWeight: 'bold'}}
+        >
+          Tekrar Kontrol Et
+        </button>
+      </div>
+    );
   }
 // EĞER GİRİŞ YAPAN KİŞİ "PATRON" İSE, ONA DÜKKANI DEĞİL YÖNETİM PANELİNİ GÖSTER
   if (session && session.user.email === PATRON_EMAIL) {
